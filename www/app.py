@@ -1,4 +1,8 @@
+import logging
+import asyncio
 from aiohttp import web
+
+logging.basicConfig(level=logging.INFO)
 
 
 async def index(request):
@@ -10,7 +14,9 @@ def setup_routes(app):
 
 
 if __name__ == '__main__':
-    app = web.Application()
+    loop = asyncio.get_event_loop()
+
+    app = web.Application(loop=loop)
     setup_routes(app)
     web.run_app(app, host='127.0.0.1', port='9000')
 
