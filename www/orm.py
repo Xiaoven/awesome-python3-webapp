@@ -129,7 +129,7 @@ class ModelMetaclass(type):
 
         # 获取所有的Field和主键名
         mappings, fields, primaryKey = dict(), list(), None
-        for k, v in attrs.items():
+        for k, v in attrs.items():  # k 是变量名，v 是 Field 对象
             if isinstance(v, Field):
                 logging.info('  found mapping: %s ==> %s' % (k, v))
                 mappings[k] = v
@@ -188,7 +188,7 @@ class Model(dict, metaclass=ModelMetaclass):  # 继承 dict，支持字典的读
 
     def getValueOrDefault(self, key):
         """
-        可自动为实例补全缺少的列属性（可能这部分数据没那么重要）
+        可自动为实例补全缺少的列属性（用于自动初始化/绑定实例属性）
         1. 查找类的实例对象是否包含key
         2. 如果不包含，但 __mappings__（表格定义）又包含了 key 对应的列，就取默认值，并添加到实例对象的attributes中
         """
@@ -197,6 +197,7 @@ class Model(dict, metaclass=ModelMetaclass):  # 继承 dict，支持字典的读
         if value is None:
             field = self.__mappings__[key]
             if field.default is not None:  # 如果该列的默认值不为 None，则返回默认值
+                # default 可以是方法，适用于如"创建时间"的列
                 value = field.default() if callable(field.default) else field.default
                 logging.debug('using default value for %s: %s' % (key, str(value)))
                 setattr(self, key, value)
