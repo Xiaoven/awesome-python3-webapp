@@ -1,3 +1,15 @@
+"""
+1. 创建全局数据库连接池的方法：create_pool
+2. 提供数据库查询、修改操作接口：select、execute
+3. 存储列信息的基本类型 Field 和其衍生类型
+4. 存储行信息的类型 Model 类型。
+    通过 metaclass 机制管理表格信息（表名、包含的列的名称和类型）；
+    提供异步的数据库查找、更新、存储、移除方法。
+5. 存储表信息的类型 ModelMetaClass.
+    提供通用的用户自定义类的创建方法，从 Model 子类的 attributes 中将列名和Field对象作为字典管理，并生成 SQL 语句模版；
+    提供为类实例自动补全带默认值的列属性的方法：getValueOrDefault
+"""
+
 import logging
 
 import aiomysql
