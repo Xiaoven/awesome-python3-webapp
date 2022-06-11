@@ -17,6 +17,7 @@ from jinja2 import Environment, FileSystemLoader
 
 from www import orm
 from www.coroweb import add_routes, add_static
+from www.config import configs
 
 logging.basicConfig(level=logging.INFO)
 
@@ -167,7 +168,8 @@ async def response_factory(env):
 async def init():
     loop = asyncio.get_event_loop()
     # 创建全局数据库连接池
-    await orm.create_pool(loop=loop, host='127.0.0.1', port=3306, user='www', password='www', db='awesome')
+    await orm.create_pool(loop=loop, host=configs.db.host, port=configs.db.port, user=configs.db.user,
+                          password=configs.db.password, db=configs.db.db)
     # 初始化 jinja2
     env = init_jinja2(filters=dict(datetime=datetime_filter))
     # 创建 aiohttp 服务器
