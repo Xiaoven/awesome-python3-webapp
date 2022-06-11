@@ -14,6 +14,9 @@ import logging
 
 import aiomysql
 
+# 全局数据库连接池
+_pool = None
+
 
 def log(sql):
     logging.info('SQL: %s' % sql)
@@ -22,7 +25,7 @@ def log(sql):
 async def create_pool(loop, **kw):
     logging.info('create database connection pool...')
 
-    global _pool  # 想对全局变量 _pool 赋值，需要先声明该函数里的 _pool 是全局变量
+    global _pool  # 声明_pool是全局变量
     _pool = await aiomysql.create_pool(
         host=kw.get('host', 'localhost'),
         port=kw.get('port', 3306),
