@@ -22,7 +22,7 @@ def log(sql):
     logging.info('SQL: %s' % sql)
 
 
-async def create_pool(loop, **kw):
+async def create_pool(**kw):
     logging.info('create database connection pool...')
 
     global _pool  # 声明_pool是全局变量
@@ -36,7 +36,6 @@ async def create_pool(loop, **kw):
         autocommit=kw.get('autocommit', True),
         maxsize=kw.get('maxsize', 10),
         minsize=kw.get('minsize', 1),
-        loop=loop
     )
 
 
@@ -103,7 +102,7 @@ class Field:
 
 
 class StringField(Field):
-    def __init__(self, name, primary_key=False, default=None, ddl='varchar(100)'):
+    def __init__(self, name=None, primary_key=False, default=None, ddl='varchar(100)'):
         super().__init__(name, ddl, primary_key, default)
 
 
@@ -257,7 +256,7 @@ class Model(dict, metaclass=ModelMetaclass):  # 继承 dict，支持字典的读
 
     @classmethod
     async def findNumber(cls, selectField, where=None, args=None):
-        ' find number by select and where. '
+        """ find number by select and where. """
         sql = ['select %s _num_ from `%s`' % (selectField, cls.__table__)]
         if where:
             sql.append('where')

@@ -7,7 +7,6 @@
 
 import json
 import logging
-import asyncio
 import time
 from datetime import datetime
 from pathlib import Path
@@ -19,7 +18,7 @@ from www import orm
 from www.coroweb import add_routes, add_static
 from www.config import configs
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 
 ###############
@@ -114,7 +113,7 @@ async def logger(request, handler):
 #     return await handler(request)
 
 
-async def response_factory(env):
+def response_factory(env):
     """
     调用handler后，将要返回数据类型进行处理，包装成 web 模块中的对应类型
     :param env: jinja2 的核心组件 env
@@ -123,7 +122,9 @@ async def response_factory(env):
     @web.middleware
     async def response(request, handler):
         logging.info('Response handler...')
+        logging.debug(f'handler info: {handler.__name__}')
         r = await handler(request)
+        logging.debug(f'[Result type] {type(r)}\n' + str(r))
         if isinstance(r, web.StreamResponse):
             return r
         if isinstance(r, bytes):
@@ -166,14 +167,13 @@ async def response_factory(env):
 # 应用初始化 #
 ############
 async def init():
-    loop = asyncio.get_event_loop()
     # 创建全局数据库连接池
-    await orm.create_pool(loop=loop, host=configs.db.host, port=configs.db.port, user=configs.db.user,
+    await orm.create_pool(host=configs.db.host, port=configs.db.port, user=configs.db.user,
                           password=configs.db.password, db=configs.db.db)
     # 初始化 jinja2
     env = init_jinja2(filters=dict(datetime=datetime_filter))
     # 创建 aiohttp 服务器
-    app = web.Application(loop=loop, middlewares=[logger, response_factory(env)])
+    app = web.Application(middlewares=[logger, response_factory(env)])
     # 批量注册handlers模块下的处理方法
     add_routes(app, 'handlers')
     # 注册静态资源默认的存储位置

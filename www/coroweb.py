@@ -31,7 +31,7 @@ def get(path):
 
         wrapper.__method__ = 'GET'
         wrapper.__route__ = path
-        return wrapper()
+        return wrapper
 
     return decorator
 
@@ -120,18 +120,21 @@ class RequestHandler(object):
                     logging.warning('Duplicate arg name in named arg and kw args: %s' % k)
                 kw[k] = v
 
-            # 检查是否包含必须的参数（不带默认值的）
-            for name in self._required_kw_args:
-                if name not in kw:
-                    return web.HTTPBadRequest('Missing argument: %s' % name)
+        if self._has_request_arg:
+            kw['request'] = request
 
-            # 步骤 2：调用真正的处理函数，并返回结果
-            logging.info('call with args: %s' % str(kw))
-            try:
-                r = await self._func(**kw)
-                return r
-            except APIError as e:
-                return dict(error=e.error, data=e.data, message=e.message)
+        # 检查是否包含必须的参数（不带默认值的）
+        for name in self._required_kw_args:
+            if name not in kw:
+                return web.HTTPBadRequest('Missing argument: %s' % name)
+
+        # 步骤 2：调用真正的处理函数，并返回结果
+        logging.info('call with args: %s' % str(kw))
+        try:
+            r = await self._func(**kw)
+            return r
+        except APIError as e:
+            return dict(error=e.error, data=e.data, message=e.message)
 
 
 def add_route(app, fn):
