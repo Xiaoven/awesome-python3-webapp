@@ -1,0 +1,32 @@
+<!-- 继承父模版 -->
+{% extends '__base__.html' %}
+
+{% block title %}日志{% endblock %}
+
+{% block content %}
+
+    <div class="uk-width-3-4">  <!-- 宽度占 3/4 -->
+        {% for blog in blogs %}
+            <div class="uk-card uk-card-default uk-card-body uk-margin-bottom uk-margin-top">
+                <h2><a href="/blog/{{ blog.id }}">{{ blog.name }}</a></h2>
+                 管道式调用 datetime 方法
+                <p class="uk-text-meta">发表于{{ blog.created_at | datetime }}</p>
+                <p>{{ blog.summary }}</p>
+                <p><a href="/blog/{{ blog.id }}" uk-icon="chevron-double-right">继续阅读</a></p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="uk-width-1-4">
+        <div class="uk-card uk-card-default uk-card-body uk-margin-bottom uk-margin-top">
+            <h3 class="uk-card-title">分类</h3>
+            <ul class="uk-list">
+                <li><a href="#">Java</a></li>
+                <li><a href="#">Python</a></li>
+                <li><a href="#">数据库</a></li>
+                <li><a href="#">其实还没想好侧边栏放什么</a></li>
+            </ul>
+        </div>
+    </div>
+
+{% endblock %}

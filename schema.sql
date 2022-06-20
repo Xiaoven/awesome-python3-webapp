@@ -43,3 +43,6 @@ create table comments (
       key `idx_created_at` (`created_at`),
       primary key (`id`)
 ) engine=innodb default charset=utf8;
+
+-- 向 users 插入数据
+-- insert into users (id, email, passwd, admin, name, image, created_at) values (2, 'joe@example.com', 'pw', false, 'Joe', 'avatar.png', 110000030);

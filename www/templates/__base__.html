@@ -1,0 +1,78 @@
+<!-- 定义了 UIkit 依赖、导航栏和页脚 -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+
+    {% block meta %}<!-- block meta  -->{% endblock %}
+
+    <title>{% block title %} ? {% endblock %} - Awesome Python Webapp</title>
+
+    <!-- UIkit 依赖 -->
+    <link rel="stylesheet" href="static/css/uikit.min.css" />
+    <script src="static/js/uikit.min.js"></script>
+    <script src="static/js/uikit-icons.min.js"></script>
+
+    {% block beforehead %}<!-- before head  -->{% endblock %}
+</head>
+<body>
+
+        <nav class="uk-navbar-container" uk-navbar>
+            <!-- 状态栏左侧组件 -->
+            <div class="uk-navbar-left">
+                <a href="/" class="uk-navbar-item uk-logo">Awesome</a>
+                <ul class="uk-navbar-nav">
+                    <li><a href="/"><span uk-icon="home"></span> 日志</a></li>
+                    <li><a href="http://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000">
+                        <span uk-icon="file-text"></span> 教程</a></li>
+                    <li><a href="https://github.com/Xiaoven/awesome-python3-webapp">
+                        <span uk-icon="code"></span> 源码</a></li>
+                </ul>
+            </div>
+
+            <!-- 状态栏右侧组件：登陆状态和未登录状态 -->
+            <div class="uk-navbar-right">
+                <ul class="uk-navbar-nav">
+                    {% if __user__ %}
+                        <li>
+                            <a href="#0"><span uk-icon="user"></span> {{ __user__.name }}</a>
+                            <!-- 下拉菜单 -->
+                            <div class="uk-navbar-dropdown">
+                                <ul class="uk-nav uk-navbar-dropdown-nav">
+                                    <li><a href="/signout"><span uk-icon="sign-out"></span>登出</a></li>
+                                </ul>
+                            </div>
+                        </li>
+                    {% else %}
+                        <li><a href="/signin"><span uk-icon="sign-in"></span>登陆</a></li>
+                        <li><a href="/register"><span uk-icon="file-edit"></span>注册</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </nav>
+
+
+    <div class="uk-container" style="background-color:#eee">  <!-- 居中、padding、尺寸自适应屏幕 -->
+        <div uk-grid> <!-- 网格系统允许按列组织元素，js会自动添加对应的 class -->
+            <!-- content -->
+            {% block content %}
+            {% endblock %}
+            <!-- // content -->
+        </div>
+    </div>
+
+    <div class="uk-margin-large-top" style="background-color:#eee; border-top:1px solid #ccc;">
+        <div class="uk-container uk-text-center">
+            <div class="uk-margin-top uk-margin-bottom">
+                <p>
+                    <a target="_blank" href="https://github.com/michaelliao" uk-icon="github"></a>
+                    <a target="_blank" href="http://www.linkedin.com/in/liaoxuefeng" uk-icon="linkedin"></a>
+                    <a target="_blank" href="https://twitter.com/liaoxuefeng" uk-icon="twitter"></a>
+                </p>
+                <p>Powered by <a href="http://awesome.liaoxuefeng.com">Awesome Python Webapp</a>. Copyright &copy; 2022. [<a href="/manage/" target="_blank">Manage</a>]</p>
+                <a target="_blank" href="http://www.w3.org/TR/html5/"><i class="uk-icon-html5" style="font-size:64px; color: #444;"></i></a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
