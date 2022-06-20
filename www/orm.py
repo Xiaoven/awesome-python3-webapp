@@ -127,7 +127,7 @@ class TextField(Field):
 
 
 def _create_args_string(num):
-    L = ['?' for _ in range(num)]
+    L = ['?' for _ in range(num + 1)]
     return ', '.join(L)
 
 
@@ -170,7 +170,7 @@ class ModelMetaclass(type):
 
         attrs['__mappings__'] = mappings  # 保存属性和列的映射关系
         attrs['__table__'] = tableName
-        attrs['__primary_key__'] = primaryKey  # 主键属性名
+        attrs['__primaryKey__'] = primaryKey  # 主键属性名
         attrs['__fields__'] = fields  # 除主键外的属性名
         # 构造默认的SELECT, INSERT, UPDATE和DELETE语句，后面的数据库操作方法根据这里的定义准备数据
         # 把列名和等待填充的参数（用"?"占位）加进语句里
@@ -188,8 +188,13 @@ class Model(dict, metaclass=ModelMetaclass):  # 继承 dict，支持字典的读
         super(Model, self).__init__(**kw)
 
     # 实现特殊方法 __getattr__()和__setattr__()，使其支持通过 "." 引用字段或新增字段
+    # 仅当属性不能在实例的__dict__或它的类(类的__dict__),或父类的__dict__中找到时，才被调用
+    # 必须抛出 AttributeError，getattr 方法在有默认值时才能正确处理
     def __getattr__(self, key):
-        return self[key]  # 失败会抛出 AttributeError
+        try:
+            return self[key]
+        except KeyError:
+            raise AttributeError(r"'Model' object has no attribute '%s'" % key)
 
     def __setattr__(self, key, value):
         self[key] = value
@@ -206,7 +211,7 @@ class Model(dict, metaclass=ModelMetaclass):  # 继承 dict，支持字典的读
         1. 查找类的实例对象是否包含key
         2. 如果不包含，但 __mappings__（表格定义）又包含了 key 对应的列，就取默认值，并添加到实例对象的attributes中
         """
-        value = getattr(self, key, None)
+        value = getattr(self, key, None)  # 如果 self 没有 key 属性，则调用类中的 __getattr__
         # 如果 self 下找不到，就去 cls 的 __mappings__ 下面找
         if value is None:
             field = self.__mappings__[key]
@@ -269,7 +274,7 @@ class Model(dict, metaclass=ModelMetaclass):  # 继承 dict，支持字典的读
     @classmethod
     async def find(cls, pk):
         """ find object by primary key. """
-        rs = await select('%s where `%s`=?' % (cls.__select__, cls.__primary_key__), [pk], 1)
+        rs = await select('%s where `%s`=?' % (cls.__select__, cls.__primaryKey__), [pk], 1)
         if len(rs) == 0:
             return None
         return cls(**rs[0])
