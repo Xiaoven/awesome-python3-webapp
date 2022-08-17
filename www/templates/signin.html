@@ -1,0 +1,64 @@
+<!-- 继承父模版 -->
+{% extends '__base__.html' %}
+
+{% block title %} 登陆 {% endblock %}
+
+{% block beforehead %}
+<script>
+    $(function(){
+        var vmAuth = new Vue({
+            el: '#vm',   // vue实例绑定的对象id
+            data: {
+                email: '',
+                passwd: ''
+            },
+            methods: {
+                submit: function (event) {
+                    event.preventDefault();  // 阻止发送表单动作
+                    // 对密码进行加密处理
+                    var
+                        $form = $('#vm'),
+                        email = this.email.trim().toLowerCase(),
+                        data = {
+                            email: email,
+                            passwd: this.passwd === '' ? '' : CryptoJS.SHA1(email + ':' + this.passwd).toString()
+                        };
+                    // 发送表单
+                    $form.postJSON('/api/authenticate', data,
+                        function (err, result) {
+                        if (!err) {
+                            location.assign('/');
+                        }
+                    });
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="uk-width-2-3 uk-align-center">
+    <form id="vm" @submit="submit" class="uk-form-stacked">
+        <div class="uk-alert-danger uk-hidden" uk-alert></div>
+
+        <div class="uk-margin">
+            <div class="uk-inline uk-width-1-1">  <!-- uk-inline 默认宽度较窄，需要 uk-width-1-1 拓宽-->
+                <span class="uk-form-icon" uk-icon="mail"></span>
+                <input v-model="email" name="email" class="uk-input" type="text" placeholder="电子邮件" maxlength="50">
+            </div>
+        </div>
+
+        <div class="uk-margin">
+            <div class="uk-inline uk-width-1-1">
+                <span class="uk-form-icon" uk-icon="lock"></span>
+                <input v-model="passwd" name="passwd" class="uk-input" type="password" placeholder="密码" maxlength="50">
+            </div>
+        </div>
+
+        <div class="uk-margin">
+            <button type="submit" class="uk-button uk-button-primary uk-align-center"><span uk-icon="sign-in"></span>登陆</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

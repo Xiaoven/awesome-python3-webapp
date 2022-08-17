@@ -4,7 +4,11 @@ create database awesome;
 
 use awesome;
 
-grant select, insert, update, delete on awesome.* to 'www-data'@'localhost' identified by 'www-data';
+--mysql 8
+create user if not exists 'www-data'@'localhost' identified by 'www-data';
+grant select, insert, update, delete on awesome.* to 'www-data'@'localhost' with grant option;
+--mysql 5
+--grant select, insert, update, delete on awesome.* to 'www-data'@'localhost' identified by 'www-data';
 
 create table users (
    `id` varchar(50) not null,

@@ -17,6 +17,7 @@ from jinja2 import Environment, FileSystemLoader
 from www import orm
 from www.coroweb import add_routes, add_static
 from www.config import configs
+from handlers import _cookie2user, COOKIE_NAME
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -97,6 +98,20 @@ async def logger(request, handler):
     logging.info('Request: %s %s' % (request.method, request.path))
     return await handler(request)
 
+@web.middleware
+async def auth(request, handler):
+    """在调用handler前解析cookie，以检查登陆状态"""
+    logging.info('check user: %s %s' % (request.method, request.path))
+    request.__user__ = None
+    cookie_str = request.cookies.get(COOKIE_NAME)
+    if cookie_str:
+        user = await _cookie2user(cookie_str)
+        if user:
+            logging.info('set current user: %s' % user.email)
+            request.__user__ = user
+    if request.path.startswith('/manage/') and (request.__user__ is None or not request.__user__.admin):
+        return web.HTTPFound('/signin')
+    return await handler(request)
 
 # @web.middleware
 # async def parse_data(request, handler):
@@ -115,12 +130,15 @@ async def logger(request, handler):
 
 def response_factory(env):
     """
-    调用handler后，将要返回数据类型进行处理，包装成 web 模块中的对应类型
+    通过闭包的方式将 env 注入 response 处理方法，并返回该闭包
     :param env: jinja2 的核心组件 env
     """
 
     @web.middleware
     async def response(request, handler):
+        """
+        调用handler来处理request，拿到response，并进行处理
+        """
         logging.info('Response handler...')
         logging.debug(f'handler info: {handler.__name__}')
         r = await handler(request)
@@ -139,13 +157,14 @@ def response_factory(env):
             return resp
         if isinstance(r, dict):
             template = r.get('__template__')  # 要使用的模版名
-            if template is None:
+            if template is None:  # 可能是自定义的异常信息
                 resp = web.Response(
                     body=json.dumps(r, ensure_ascii=False, default=lambda o: o.__dict__).encode('utf-8'))
                 resp.content_type = 'application/json;charset=utf-8'
                 return resp
             else:
                 # 访问 jinja2 的核心组件 env，用来获取html模版
+                r['__user__'] = request.__user__  # 统一注入用户信息
                 resp = web.Response(body=env.get_template(template).render(**r).encode('utf-8'))
                 resp.content_type = 'text/html;charset=utf-8'
                 return resp
@@ -173,7 +192,7 @@ async def init():
     # 初始化 jinja2
     env = init_jinja2(filters=dict(datetime=datetime_filter))
     # 创建 aiohttp 服务器
-    app = web.Application(middlewares=[logger, response_factory(env)])
+    app = web.Application(middlewares=[logger, auth, response_factory(env)])
     # 批量注册handlers模块下的处理方法
     add_routes(app, 'handlers')
     # 注册静态资源默认的存储位置

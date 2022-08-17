@@ -9,10 +9,16 @@
     <title>{% block title %} ? {% endblock %} - Awesome Python Webapp</title>
 
     <!-- UIkit 依赖 -->
-    <link rel="stylesheet" href="static/css/uikit.min.css" />
-    <script src="static/js/uikit.min.js"></script>
-    <script src="static/js/uikit-icons.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.14.3/css/uikit.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.14.3/js/uikit.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.14.3/js/uikit-icons.min.js"></script>
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha1/0.6.0/sha1.min.js"></script>-->
+
+    <script src="/static/js/awesome.js"></script>
     {% block beforehead %}<!-- before head  -->{% endblock %}
 </head>
 <body>
@@ -52,7 +58,7 @@
         </nav>
 
 
-    <div class="uk-container" style="background-color:#eee">  <!-- 居中、padding、尺寸自适应屏幕 -->
+    <div class="uk-container">  <!-- 居中、padding、尺寸自适应屏幕 -->
         <div uk-grid> <!-- 网格系统允许按列组织元素，js会自动添加对应的 class -->
             <!-- content -->
             {% block content %}
@@ -63,14 +69,14 @@
 
     <div class="uk-margin-large-top" style="background-color:#eee; border-top:1px solid #ccc;">
         <div class="uk-container uk-text-center">
-            <div class="uk-margin-top uk-margin-bottom">
+            <div class="uk-margin-top">
                 <p>
                     <a target="_blank" href="https://github.com/michaelliao" uk-icon="github"></a>
                     <a target="_blank" href="http://www.linkedin.com/in/liaoxuefeng" uk-icon="linkedin"></a>
                     <a target="_blank" href="https://twitter.com/liaoxuefeng" uk-icon="twitter"></a>
                 </p>
                 <p>Powered by <a href="http://awesome.liaoxuefeng.com">Awesome Python Webapp</a>. Copyright &copy; 2022. [<a href="/manage/" target="_blank">Manage</a>]</p>
-                <a target="_blank" href="http://www.w3.org/TR/html5/"><i class="uk-icon-html5" style="font-size:64px; color: #444;"></i></a>
+                <a target="_blank" href="http://www.w3.org/TR/html5/"><span uk-icon="google" style="font-size:64px; color: #444;"></span></a>
             </div>
         </div>
     </div>

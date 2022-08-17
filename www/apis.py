@@ -1,6 +1,7 @@
 class APIError(Exception):
     """
     the base APIError which contains error(required), data(optional) and message(optional).
+    调用handler的过程中如果抛出此类异常，会被捕获并将错误信息处理成 dict 返回
     """
 
     def __init__(self, error, data='', message=''):
